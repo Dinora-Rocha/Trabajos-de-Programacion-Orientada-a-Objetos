@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1789058372 source:/home/marlen/Escritorio/TRABAJOS UNI/vectorde cadenas/main.cpp
+	<iostream>
+	<string>
+	<vector>
+

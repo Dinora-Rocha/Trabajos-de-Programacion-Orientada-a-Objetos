@@ -1,0 +1,122 @@
+
+#include "persona.h"
+#include <iostream>
+#include <fstream>
+#include <ctime>
+
+// Constructor
+Persona::Persona()
+{
+    nombre = "Sin nombre";
+    telefono = "Sin telefono guardado";
+    CURP = "Sin CURP registrada";
+    nacimiento = {0, 0, 0};
+
+std::cout << "Persona creada" << endl;
+}
+
+Persona::Persona(string N , string  t, string c, FECHA f)
+{
+nombre=N;
+telefono = t;
+CURP = c;
+nacimiento = f;
+
+}
+
+//DESTRUCTOR
+//DESTRUCTOR
+Persona::~Persona() {
+    std::cout << this->nombre << " ha sido destruido" << endl;
+}
+
+void Persona::mostrarDatos() const
+{
+    cout << "Nombre: " << nombre << endl;
+    cout << "Telefono: " << telefono << endl;
+    cout << "CURP: " << CURP << endl;
+    cout << "Fecha de nacimiento: " << nacimiento.d << "/" << nacimiento.m << "/" << nacimiento.a << endl;
+}
+
+// Módulo del caso 4
+void Persona::calcularEdadYCumpleanios() const
+{
+    FECHA f = nacimiento;
+
+    time_t ahora = time(nullptr);
+    tm* fechaActual = localtime(&ahora);
+
+    int diaHoy = fechaActual->tm_mday;
+    int mesHoy = fechaActual->tm_mon + 1;
+    int anioHoy = fechaActual->tm_year + 1900;
+
+    int edad = anioHoy - f.a;
+    if (mesHoy < f.m || (mesHoy == f.m && diaHoy < f.d))
+    {
+        edad--;
+    }
+
+    int meses = mesHoy - f.m;
+    int dias = diaHoy - f.d;
+    if (dias < 0)
+    {
+        meses--;
+    }
+    if (meses < 0)
+    {
+        meses += 12;
+    }
+
+    tm proximoCumple = {};
+    proximoCumple.tm_mday = f.d;
+    proximoCumple.tm_mon = f.m - 1;
+    proximoCumple.tm_year = anioHoy - 1900;
+
+    if (mesHoy > f.m || (mesHoy == f.m && diaHoy > f.d))
+    {
+        proximoCumple.tm_year++;
+    }
+
+    time_t tiempoCumple = mktime(&proximoCumple);
+    double segundosFaltantes = difftime(tiempoCumple, ahora);
+    int diasFaltantes = segundosFaltantes / 86400 + 0.5;
+
+    cout << "\nEdad: " << edad << " anos " << meses << " meses y " << diaHoy << " dias" << endl;
+    if (diasFaltantes == 0)
+        cout << "Hoy es su cumpleanos!" << endl;
+    else
+        cout << "\nFaltan " << diasFaltantes << " dias para su proximo cumpleanos." << endl;
+}
+
+// Setters
+void Persona::setNombre(string n) { nombre = n; }
+void Persona::setTelefono(string t) { telefono = t; }
+void Persona::setCURP(string C) { CURP = C; }
+void Persona::setFec_na(FECHA f) { nacimiento = f; }
+
+// Getters
+string Persona::getNombre() const { return nombre; }
+string Persona::getTelefono() const { return telefono; }
+string Persona::getCURP() const { return CURP; }
+FECHA Persona::getFec_na() const { return nacimiento; }
+
+// Funciones Auxiliares
+string trim(string s)
+{
+    size_t inicio = s.find_first_not_of(" \t");
+    if (inicio == string::npos) return "";
+    size_t fin = s.find_last_not_of(" \t");
+    return s.substr(inicio, fin - inicio + 1);
+}
+
+void guardarArchivo(const vector<Persona>& lista, const string& nombreArchivo)
+{
+    ofstream Listado(nombreArchivo);
+    for (const auto& n : lista)
+    {
+        FECHA f = n.getFec_na();
+        Listado << n.getNombre() << ", " << n.getTelefono() << ", "
+                << n.getCURP() << ", " << f.d << "/" << f.m << "/" << f.a << endl;
+    }
+    Listado.close();
+}
